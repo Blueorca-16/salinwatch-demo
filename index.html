@@ -96,6 +96,38 @@ th:first-child,td:first-child{text-align:left;font-weight:600}
 #push p{font-size:13px;line-height:18px}
 .pulse{animation:pulse 1.2s ease-out infinite;transform-origin:center;transform-box:fill-box}
 @keyframes pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.4);opacity:0}}
+/* plan v2 */
+.hero{display:flex;gap:16px;align-items:center;border-radius:20px;padding:16px 18px;color:#fff;background:linear-gradient(135deg,#0B6E8A,#0E8E95)}
+.hero .k{font-size:11px;font-weight:600;opacity:.75}.hero .big{font-size:30px;font-weight:700;margin:2px 0}.hero .s{font-size:12px;opacity:.85}
+.hero .okp{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:600;color:#7BE0B0}
+.ring{animation:ring 1.1s cubic-bezier(.3,.8,.3,1) both}@keyframes ring{from{stroke-dashoffset:213.6}}
+.why{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px;padding:14px}
+.why .ib{background:var(--warnBg);border-radius:12px;padding:8px;display:flex;flex:none}
+.why b{font-size:14px}.why p{font-size:12.5px;line-height:18px;color:var(--muted);margin-top:3px}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--muted)}.leg i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-left:6px}
+.tl{position:relative;margin-top:30px}
+.tlr{display:grid;grid-template-columns:58px 1fr;gap:10px;align-items:center;margin-bottom:12px}
+.tlr b{display:block;font-size:14px}.tlr .dl{font-size:11px;font-weight:600}
+.trk{position:relative;height:28px;border-radius:9px;background:#F1F5F7;background-image:linear-gradient(90deg,transparent calc(25% - 1px),#E3EAEE calc(25% - 1px),#E3EAEE 25%,transparent 25%,transparent calc(50% - 1px),#E3EAEE calc(50% - 1px),#E3EAEE 50%,transparent 50%,transparent calc(75% - 1px),#E3EAEE calc(75% - 1px),#E3EAEE 75%,transparent 75%)}
+.trk i{position:absolute;top:3px;bottom:3px;border-radius:7px;color:#fff;font-size:10px;font-weight:600;font-style:normal;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;animation:grow .7s cubic-bezier(.3,.8,.3,1) both;transform-origin:left}
+@keyframes grow{from{transform:scaleX(0)}}
+.ax2{margin:0}.nowl{position:absolute;top:-4px;bottom:22px;width:2px;background:var(--bad);border-radius:1px;z-index:2}
+.nowl span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:#fff;background:var(--bad);border-radius:6px;padding:1px 5px}
+.wcs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wc{background:#fff;border-radius:16px;padding:12px}.wc b{font-size:14px}.wc .pill{font-size:10px;padding:3px 7px}
+.wc .n{font-size:22px;font-weight:700;margin-top:8px}.wc>span{font-size:12px;color:var(--muted)}
+/* carte réelle */
+.mapcard{padding:12px}
+.mapscroll{overflow-x:auto;overflow-y:hidden;border-radius:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mapscroll::-webkit-scrollbar{display:none}
+.mapin{position:relative}.mapin img{display:block;user-select:none;-webkit-user-drag:none}
+.st{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.st.site{width:18px;height:18px;margin:-9px 0 0 -9px;border-width:3px;z-index:3;cursor:pointer}
+.st.site.alert::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:var(--bad);animation:pulse2 1.3s ease-out infinite;z-index:-1}
+@keyframes pulse2{0%{transform:scale(1);opacity:.55}100%{transform:scale(3);opacity:0}}
+.sitelab{position:absolute;transform:translateX(-50%);font-size:11px;font-weight:700;background:rgba(255,255,255,.92);border-radius:6px;padding:2px 6px;white-space:nowrap;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.attr{position:absolute;right:6px;bottom:4px;font-size:9px;color:#555;background:rgba(255,255,255,.8);border-radius:4px;padding:0 4px}
+.maphint{text-align:center;font-size:11px;font-weight:500;color:var(--muted);margin-top:8px}
 </style>
 </head>
 <body>
@@ -159,15 +191,36 @@ function rDetail(){const id=S.well;let v,st,vals,slots,tr,lbl;
  ${id==='F2'&&S.phase==='stopped'?`<div class="banner"><div class="ib">${ic('power','#fff',22)}</div><div><b>Pompe F2 arrêtée automatiquement</b><span>Eau encore douce · SMS envoyé au gérant</span></div></div>`:''}
  <div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">7 derniers jours</div>${chart(vals,c,slots)}<div class="days"><span>mer</span><span>jeu</span><span>ven</span><span>sam</span><span>dim</span><span>lun</span><span>auj.</span></div></div>
  ${id==='F2'&&S.phase==='stopped'?`<button class="btn" data-act="tab" data-t="plan">Voir le plan du jour</button>`:''}</div>`;}
-function rPlan(){const seg=(s,e,c)=>`<div class="seg"><i style="left:${s/24*100}%;width:${(e-s)/24*100}%;background:${c}"></i></div>`;
- const it=(n,h,s,e,c,note)=>`<div><div class="row"><b style="font-size:14px;font-weight:600">${n}</b><b style="font-size:13px;font-weight:600;color:${c}">${h}</b></div>${seg(s,e,c)}${note?`<div style="font-size:12px;font-weight:500;color:${c};margin-top:7px">${note}</div>`:''}</div>`;
- return `<div class="col">${header('Plan du jour',new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}).replace(/^./,m=>m.toUpperCase()))}<div class="card"><div><span style="font-size:30px;font-weight:700">228 m³</span><span class="unit">prévus</span></div><div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px;color:${CL.ok};font-size:13px;font-weight:600">${ic('check',CL.ok,16)}Production maintenue</div></div>
- <div class="card col"><div style="font-size:15px;font-weight:600">Horaires du jour</div>${it('Forage F1','18 h · 108 m³',4,22,CL.brand)}${it('Forage F2','4 h · 20 m³',1,5,CL.warn,'En repos')}${it('Forage F3','20 h · 100 m³',3,23,CL.brand)}<div class="ax"><span>0 h</span><span>6 h</span><span>12 h</span><span>18 h</span><span>24 h</span></div></div>
+function rPlan(){const stopped=S.phase==='stopped';
+ const W=[{id:'F1',s:4,e:22,m3:108,d:'+4 h',c:CL.brand,t:'Compense',tc:CL.brand,tb:CL.brandBg},{id:'F2',s:1,e:5,m3:20,d:'−10 h',c:CL.warn,t:'Repos',tc:CL.warn,tb:CL.warnBg},{id:'F3',s:3,e:23,m3:100,d:'+6 h',c:CL.brand,t:'Compense',tc:CL.brand,tb:CL.brandBg}];
+ const d=new Date(),h=d.getHours()+d.getMinutes()/60,hh=n=>String(n).padStart(2,'0');
+ const R=34,L=2*Math.PI*R;
+ const donut=`<svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${R}" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="10"/><circle cx="48" cy="48" r="${R}" fill="none" stroke="#7BE0B0" stroke-width="10" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="0" transform="rotate(-90 48 48)" class="ring"/><text x="48" y="46" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">102 %</text><text x="48" y="62" text-anchor="middle" font-size="10" font-weight="500" fill="rgba(255,255,255,.75)">du besoin</text></svg>`;
+ const why=stopped?`F2 a atteint le seuil d’arrêt à ${S.stopAt}. Il ne pompe plus que la nuit, quand la nappe s’est reposée. F1 et F3 prennent le relais.`:`La salinité de F2 monte. Il pompe moins et se repose la journée, pendant que F1 et F3 prennent le relais.`;
+ const rows=W.map(w=>`<div class="tlr"><div><b>${w.id}</b><span class="dl" style="color:${w.c}">${w.d}</span></div><div class="trk"><i style="left:${w.s/24*100}%;width:${(w.e-w.s)/24*100}%;background:${w.c}">${hh(w.s)}–${hh(w.e)} h</i></div></div>`).join('');
+ const cards=W.map(w=>`<div class="wc"><div class="row"><b>${w.id}</b>${pill(w.t,w.tc,w.tb)}</div><div class="n">${w.e-w.s} h</div><span>${w.m3} m³</span></div>`).join('');
+ return `<div class="col">${header('Plan du jour',d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}).replace(/^./,m=>m.toUpperCase()))}
+ <div class="hero">${donut}<div><div class="k">PRODUCTION PRÉVUE</div><div class="big">228 m³</div><div class="s">Besoin du jour : 224 m³</div><div class="okp">${ic('check','#7BE0B0',14)} Production maintenue</div></div></div>
+ <div class="why"><div class="ib">${ic('alert',CL.warn,18)}</div><div><b>Pourquoi ce plan ?</b><p>${why}</p></div></div>
+ <div class="card"><div class="row"><b style="font-size:15px">Horaires de pompage</b><span class="leg"><i style="background:${CL.brand}"></i>Pompage<i style="background:${CL.line}"></i>Arrêt</span></div>
+ <div class="tl"><div class="nowl" style="left:calc(68px + (100% - 68px) * ${(h/24).toFixed(4)})"><span>${hh(d.getHours())}:${hh(d.getMinutes())}</span></div>${rows}<div class="tlr ax2"><div></div><div class="ax"><span>0 h</span><span>6 h</span><span>12 h</span><span>18 h</span><span>24 h</span></div></div></div></div>
+ <div class="wcs">${cards}</div>
  <button class="btn ${S.plan?'ok':''}" data-act="plan">${ic('check','#fff',18)}${S.plan?'Plan appliqué aux pompes':'Appliquer le plan'}</button></div>`;}
-function rMap(){const bad=f2State()==='bad';const pts=[[28,165,'ok'],[55,175,'ok'],[100,178,'ok'],[137,181,'warn'],[178,166,'warn'],[192,145,'ok'],[224,170,'warn'],[246,178,'ok'],[274,170,'ok'],[296,176,'ok'],[170,122,'ok'],[238,125,'ok'],[82,150,'ok']];const site=bad?CL.bad:CL.warn;
- return `<div class="col">${header('Intrusion saline','Bande côtière · 14 stations')}<div class="card"><svg viewBox="0 0 318 250" width="100%" style="display:block;border-radius:12px"><rect width="318" height="250" rx="12" fill="#EEF2E4"/><path d="M0 192 C55 198 110 186 160 194 S265 188 318 192 V250 H0Z" fill="#CFE6EF"/><ellipse cx="205" cy="98" rx="42" ry="24" fill="#CFE6EF"/><path d="M0 172 C40 168 80 176 118 171" stroke="#CFE6EF" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M0 160 C80 156 170 166 318 160" stroke="${CL.bad}" stroke-width="1.5" stroke-dasharray="5 4" fill="none" opacity=".55"/>${pts.map(([x,y,s])=>`<circle cx="${x}" cy="${y}" r="6" fill="${s==='ok'?CL.ok:CL.warn}" stroke="#fff" stroke-width="2"/>`).join('')}<circle cx="157" cy="180" r="7" fill="${site}" class="${bad?'pulse':''}"/><circle cx="157" cy="180" r="7" fill="${site}" stroke="#fff" stroke-width="2.5"/>
- <g font-family="Inter,system-ui,sans-serif" font-size="11" font-weight="600" fill="${CL.muted}"><text x="12" y="157">Ouidah</text><text x="165" y="69">Abomey-Calavi</text><text x="204" y="161">Cotonou</text><text x="250" y="197">Sèmè-Podji</text></g><text x="180" y="101" font-size="10" font-weight="500" fill="${CL.brand}">Lac Nokoué</text><text x="112" y="211" font-size="11" font-weight="700" fill="${site}">Votre site · Togbin</text><rect x="105" y="160" width="125" height="58" fill="transparent" data-act="well" data-w="F2" style="cursor:pointer"/></svg>
- <div class="row" style="justify-content:flex-start;gap:8px;margin-top:12px;flex-wrap:wrap">${pill('● Normal 10',CL.ok,CL.okBg)}${pill('● Vigilance '+(bad?3:4),CL.warn,CL.warnBg)}${pill('● Alerte '+(bad?1:0),CL.bad,CL.badBg)}</div></div></div>`;}
+const MB={w:2.04,e:2.66,s:6.30,n:6.53,W:903,H:337};
+const merc=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360));
+const proj=(lat,lon)=>[(lon-MB.w)/(MB.e-MB.w)*MB.W,(merc(MB.n)-merc(lat))/(merc(MB.n)-merc(MB.s))*MB.H];
+const STATIONS=[['Ouidah',6.372,2.083,'ok'],['Avlékété',6.355,2.204,'ok'],['Pahou',6.391,2.212,'ok'],['Hêvié',6.456,2.243,'ok'],['Cococodji',6.392,2.272,'warn'],['Godomey',6.391,2.345,'warn'],['Togba',6.472,2.306,'ok'],['Abomey-Calavi',6.462,2.352,'ok'],['Fidjrossè',6.356,2.372,'warn'],['Agbangandan',6.382,2.490,'ok'],['Ekpè',6.394,2.541,'ok'],['Sèmè-Kpodji',6.387,2.604,'ok'],['Djèrègbé',6.434,2.625,'ok']];
+const SITE=[6.366,2.318];
+function rMap(){const bad=f2State()==='bad';const site=bad?CL.bad:CL.warn;const [sx,sy]=proj(...SITE);
+ const dots=STATIONS.map(([n,la,lo,s])=>{const [x,y]=proj(la,lo);const c=s==='ok'?CL.ok:CL.warn;return `<span class="st" style="left:${x}px;top:${y}px;background:${c}" title="${n}"></span>`;}).join('');
+ return `<div class="col">${header('Intrusion saline','Bande côtière · 14 stations')}
+ <div class="card mapcard"><div class="mapscroll"><div class="mapin" style="width:${MB.W}px;height:${MB.H}px"><img src="carte-cote.jpg" width="${MB.W}" height="${MB.H}" alt="Carte de la côte, d’Ouidah à Sèmè-Kpodji">${dots}
+ <span class="st site ${bad?'alert':''}" style="left:${sx}px;top:${sy}px;background:${site}" data-act="well" data-w="F2"></span>
+ <span class="sitelab" style="left:${sx}px;top:${sy+12}px;color:${site}" data-act="well" data-w="F2">Votre site · Togbin</span>
+ <span class="attr">© OpenStreetMap</span></div></div>
+ <div class="maphint">← Glissez pour parcourir la côte →</div>
+ <div class="row" style="justify-content:flex-start;gap:8px;margin-top:10px;flex-wrap:wrap">${pill('● Normal 10',CL.ok,CL.okBg)}${pill('● Vigilance '+(bad?3:4),CL.warn,CL.warnBg)}${pill('● Alerte '+(bad?1:0),CL.bad,CL.badBg)}</div></div>
+ <div class="why"><div class="ib" style="background:${CL.brandBg}">${ic('map',CL.brand,18)}</div><div><b>Cette semaine</b><p>${bad?'Alerte à Togbin.':'Vigilance à Togbin.'} Salinité en hausse aussi à Cococodji, Godomey et Fidjrossè, le long de la côte.</p></div></div></div>`;}
 function rReport(){return `<div class="col">${header('Rapport mensuel','Septembre 2026 · 3 forages')}<div class="sum" style="background:${CL.ok}"><div class="k">CONFORMITÉ DU MOIS</div><div class="t" style="font-size:36px">100 %</div><div style="font-size:13px;font-weight:500">du temps sous le seuil d’alerte (750 µS/cm)</div></div>
  <div class="card" style="padding:8px 16px"><table><tr><th>Forage</th><th>Moyenne</th><th>Max</th><th>Pompage</th></tr><tr><td>F1</td><td>318</td><td>341</td><td>420 h</td></tr><tr><td>F2</td><td>372</td><td>468</td><td>396 h</td></tr><tr><td>F3</td><td>289</td><td>306</td><td>430 h</td></tr></table><div style="font-size:11px;font-weight:500;color:${CL.muted};padding:4px 0 8px">Valeurs en µS/cm</div></div>
  <button class="btn ${S.pdf?'ok':''}" data-act="pdf">${ic(S.pdf?'check':'download','#fff',18)}${S.pdf?'Rapport téléchargé':'Télécharger en PDF'}</button></div>`;}
@@ -177,7 +230,7 @@ function rNotifs(){const item=(icn,t,s,c,b)=>`<div class="ni"><div class="ib" st
 const R={home:rHome,detail:rDetail,plan:rPlan,map:rMap,report:rReport,notifs:rNotifs};
 const TABS=[['home','Accueil','home'],['plan','Plan','calendar'],['map','Carte','map'],['report','Rapport','file']];
 function renderTabs(){const tabbed=['home','plan','map','report'].includes(S.screen);$('#tabs').className=tabbed?'':'hide';$('#tabs').innerHTML=TABS.map(([k,l,i])=>`<button class="${S.screen===k?'on':''}" data-act="tab" data-t="${k}">${ic(i,S.screen===k?CL.brand:CL.muted,24)}${l}</button>`).join('');}
-function render(){const el=$('#s-'+S.screen);el.innerHTML=R[S.screen]();renderTabs();}
+function render(){const el=$('#s-'+S.screen);const om=el.querySelector('.mapscroll');const sl=om?om.scrollLeft:null;el.innerHTML=R[S.screen]();const nm=el.querySelector('.mapscroll');if(nm)nm.scrollLeft=sl!=null?sl:proj(...SITE)[0]-nm.clientWidth/2;renderTabs();}
 let raf=0;function invalidate(){if(!raf)raf=requestAnimationFrame(()=>{raf=0;render();});}
 function go(scr,opt={}){if(opt.well)S.well=opt.well;const prev=S.screen;if(scr==='notifs')S.unread=0;S.screen=scr;
  document.querySelectorAll('.scr').forEach(e=>{const on=e.id==='s-'+scr;e.classList.toggle('off',!on&&e.id!=='s-'+prev);e.classList.remove('offL');});
