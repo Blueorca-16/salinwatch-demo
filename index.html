@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0B6E8A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SalinWatch">
+<title>SalinWatch</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F6F8;--ink:#0F2A36;--muted:#5B7280;--brand:#0B6E8A;--brand2:#10A3A3;--brandBg:#E2F2F5;--ok:#1E9E62;--okBg:#E3F5EC;--warn:#C97400;--warnBg:#FFF1DB;--bad:#D63B3B;--badBg:#FDE4E4;--line:#DCE5EA;--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#E4EBEF;font-family:Inter,system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);overscroll-behavior:none}
+#app{position:relative;max-width:430px;height:100dvh;margin:0 auto;background:var(--bg);overflow:hidden}
+.scr{position:absolute;inset:0;overflow-y:auto;padding:calc(var(--top) + 14px) 20px calc(110px + var(--bot));background:var(--bg);transition:transform .3s cubic-bezier(.2,.8,.2,1),opacity .25s ease;will-change:transform}
+.scr.off{opacity:0;pointer-events:none;transform:translateX(24px)}
+.scr.offL{opacity:0;pointer-events:none;transform:translateX(-24px)}
+.col>*+*{margin-top:14px}
+/* splash */
+#splash{position:absolute;inset:0;z-index:50;background:var(--brand);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;transition:opacity .45s ease;overflow:hidden}
+#splash.gone{opacity:0;pointer-events:none}
+#splash .c1{position:absolute;width:520px;height:520px;border-radius:50%;background:rgba(16,163,163,.25);left:-160px;bottom:-240px}
+#splash .c2{position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06);right:-90px;top:-90px}
+#splash h1{font-size:36px;font-weight:700;margin-top:16px}
+#splash p{font-size:16px;font-weight:500;opacity:.85;margin-top:10px;line-height:22px}
+#splash .lg{animation:pop .7s cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+/* header */
+.hd{display:flex;align-items:center;justify-content:space-between;padding:4px 0 2px}
+.hd .l{display:flex;align-items:center;gap:12px}
+.hd h2{font-size:20px;font-weight:700}.hd.back h2{font-size:18px}
+.hd small{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.rnd{width:40px;height:40px;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;border:0;cursor:pointer}
+.badge{position:absolute;top:-2px;right:-6px;background:var(--bad);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:1px 5px;transition:transform .3s}
+/* cards */
+.card{background:#fff;border-radius:18px;padding:16px}
+.sum{border-radius:20px;padding:18px;color:#fff;background:var(--brand);transition:background .5s}
+.sum.bad{background:var(--bad)}
+.sum .k{font-size:11px;font-weight:600;opacity:.75;letter-spacing:.2px}
+.sum .t{font-size:22px;font-weight:700;margin:6px 0}
+.sum .s{font-size:11px;opacity:.75}
+.lab{font-size:16px;font-weight:700}
+.well{background:#fff;border-radius:16px;padding:16px;border:1px solid var(--line);transition:border-color .4s;cursor:pointer}
+.well.warn{border:1.5px solid var(--warn)}.well.bad{border:1.5px solid var(--bad)}
+.row{display:flex;align-items:center;justify-content:space-between}
+.well .nm{font-size:16px;font-weight:600}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;transition:background .4s,color .4s}
+.val{font-weight:700;font-variant-numeric:tabular-nums;transition:color .4s}
+.unit{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+.tr{font-size:12px;font-weight:500;margin-top:2px}
+.well .bot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px}
+/* detail */
+.gauge{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:8px}
+.gauge i{display:block;height:100%;border-radius:4px}
+.gl{text-align:right;font-size:10px;font-weight:500;color:var(--muted);margin-top:6px}
+.days{display:flex;justify-content:space-between;font-size:10px;font-weight:500;color:var(--muted);margin-top:8px}
+.banner{display:flex;gap:12px;align-items:center;background:var(--badBg);border:1px solid rgba(214,59,59,.35);border-radius:18px;padding:14px;animation:fadeup .4s ease both}
+.banner .ib{background:var(--bad);border-radius:12px;padding:8px;display:flex}
+.banner b{display:block;color:var(--bad);font-size:15px}.banner span{font-size:12px;font-weight:600;color:var(--muted)}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.btn{width:100%;border:0;border-radius:14px;padding:15px;font:600 15px Inter,system-ui,sans-serif;color:#fff;background:var(--brand);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background .3s,transform .1s}
+.btn:active{transform:scale(.98)}.btn.ok{background:var(--ok)}
+/* plan */
+.seg{height:14px;border-radius:7px;background:var(--line);position:relative;overflow:hidden;margin-top:7px}
+.seg i{position:absolute;top:0;bottom:0;border-radius:7px}
+.ax{display:flex;justify-content:space-between;font-size:10px;font-weight:500;color:var(--muted)}
+/* table */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;font-weight:600;color:var(--muted);text-align:right;padding:10px 0}
+td{font-weight:500;text-align:right;padding:10px 0;border-top:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+/* notifs list */
+.ni{display:flex;gap:12px;align-items:center;background:#fff;border-radius:16px;padding:14px}
+.ni .ib{border-radius:12px;padding:8px;display:flex}
+.ni b{font-size:14px;font-weight:600;display:block}.ni span{font-size:12px;color:var(--muted)}
+.ghost{background:none;border:1px solid var(--line);color:var(--brand)}
+/* tabbar */
+#tabs{position:absolute;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-between;padding:10px 28px calc(14px + var(--bot));transition:transform .3s}
+#tabs.hide{transform:translateY(110%)}
+#tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:4px;font:500 11px Inter,system-ui,sans-serif;color:var(--muted);padding:0 6px;cursor:pointer}
+#tabs button.on{color:var(--brand);font-weight:600}
+/* push */
+#veil{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .35s}
+#veil.on{opacity:1;pointer-events:auto}
+#push{position:absolute;left:12px;right:12px;top:calc(var(--top) + 10px);z-index:40;background:#fff;border-radius:22px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.18);transform:translateY(-140%);transition:transform .45s cubic-bezier(.2,.9,.25,1.05);cursor:pointer}
+#push.on{transform:none}
+#push .h{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;color:var(--muted)}
+#push .h span{display:flex;gap:8px;align-items:center}
+#push b{display:block;color:var(--bad);font-size:15px;margin:6px 0 4px}
+#push p{font-size:13px;line-height:18px}
+.pulse{animation:pulse 1.2s ease-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.4);opacity:0}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="scr" id="s-home"></div>
+  <div class="scr off" id="s-detail"></div>
+  <div class="scr off" id="s-plan"></div>
+  <div class="scr off" id="s-map"></div>
+  <div class="scr off" id="s-report"></div>
+  <div class="scr off" id="s-notifs"></div>
+  <nav id="tabs"></nav>
+  <div id="veil"></div>
+  <div id="push"></div>
+  <div id="splash"><div class="c1"></div><div class="c2"></div><div class="lg" id="splogo"></div><h1>SalinWatch</h1><p>Surveiller aujourd’hui pour<br>préserver notre futur.</p></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const CL={ink:'#0F2A36',muted:'#5B7280',brand:'#0B6E8A',ok:'#1E9E62',okBg:'#E3F5EC',warn:'#C97400',warnBg:'#FFF1DB',bad:'#D63B3B',badBg:'#FDE4E4',brandBg:'#E2F2F5',line:'#DCE5EA'};
+const ICONS={bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',home:'<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>',calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',map:'<path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/>',file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',chevL:'<path d="m15 18-6-6 6-6"/>',chevR:'<path d="m9 18 6-6-6-6"/>',power:'<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/>',check:'<path d="M20 6 9 17l-5-5"/>',download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/>',alert:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',replay:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>'};
+const ic=(n,c,s=24)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+const logo=(s,inv)=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40"><rect width="40" height="40" rx="12" fill="${inv?'#fff':'#0B6E8A'}"/><path d="M20 7c5 7 9.5 11.5 9.5 16.5a9.5 9.5 0 0 1-19 0C10.5 18.5 15 14 20 7z" fill="${inv?'#0B6E8A':'#fff'}"/><path d="M13.5 25c2.2 1.6 4.3 1.6 6.5 0s4.3-1.6 6.5 0" stroke="#10A3A3" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`;
+$('#splogo').innerHTML=logo(96,true);
+// ---------- data ----------
+let seed=23;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const base2=Array.from({length:40},(_,i)=>300+220*Math.pow(i/39,2.2)+(rnd()-.5)*16);
+const flat=b=>Array.from({length:60},()=>b+(rnd()-.5)*14);
+const H1=flat(320),H3=flat(290);
+const SLOTS=62;
+const fmt=v=>Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const now=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+let S;
+function reset(){S={v1:320,v3:290,v2:520,live:[],phase:'idle',events:[],unread:0,plan:false,pdf:false,well:'F2',screen:'home',alertAt:null,stopAt:null};}
+reset();
+const status=v=>v<500?'ok':v<750?'warn':'bad';
+const STL={ok:['Normal',CL.ok,CL.okBg],warn:['Vigilance',CL.warn,CL.warnBg],bad:['Alerte',CL.bad,CL.badBg]};
+const hist2=()=>{if(S.phase==='idle')return base2;const p=[];for(let x=520+18;x<S.v2;x+=18)p.push(x);p.push(S.v2);return base2.concat(p);};
+function f2State(){if(S.phase==='stopped')return 'bad';return status(S.v2);}
+function f2Trend(){const v=S.v2;if(S.phase==='idle')return '↑ +45 % en 7 jours';if(S.phase==='stopped')return 'Pompe arrêtée à '+S.stopAt;if(S.phase==='rise2'&&v>=885)return 'Arrêt automatique imminent';return '↑ +'+Math.round((v-520)/520*100)+' % en 1 h'+(v>=750?' · hausse rapide':'');}
+// ---------- svg helpers ----------
+function spark(vals,col,lo,hi,slots){const w=110,h=38;const n=slots||vals.length;const pts=vals.map((v,i)=>`${(i/(n-1)*w).toFixed(1)},${(h-3-(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo)*(h-6)).toFixed(1)}`).join(' ');return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
+function chart(vals,col,slots){const W=318,HH=150,y=v=>8+(1050-v)/850*(HH-16),n=slots||vals.length,x=i=>i/(n-1)*W;const line=vals.map((v,i)=>x(i).toFixed(1)+','+y(v).toFixed(1)).join(' ');const lx=x(vals.length-1),ly=y(vals[vals.length-1]);
+ return `<svg viewBox="0 0 ${W} ${HH}" width="100%" style="display:block;overflow:visible"><path d="M0,${HH} L${line.split(' ').join(' L')} L${lx.toFixed(1)},${HH} Z" fill="${col}" fill-opacity=".12"/><line x1="0" x2="${W}" y1="${y(900)}" y2="${y(900)}" stroke="${CL.bad}" stroke-width="1.5" stroke-dasharray="5 4"/><line x1="0" x2="${W}" y1="${y(750)}" y2="${y(750)}" stroke="${CL.warn}" stroke-width="1.2" stroke-dasharray="3 4"/><text x="4" y="${y(900)-5}" font-size="10" font-weight="600" fill="${CL.bad}">Arrêt auto 900</text><text x="4" y="${y(750)+13}" font-size="10" font-weight="600" fill="${CL.warn}">Alerte 750</text><polyline points="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${lx}" cy="${ly}" r="5" fill="${col}" stroke="#fff" stroke-width="2"/></svg>`;}
+const pill=(t,c,b)=>`<span class="pill" style="color:${c};background:${b}">${t}</span>`;
+const bell=()=>`<button class="rnd" data-act="notifs">${ic('bell',CL.ink,20)}${S.unread?`<span class="badge">${S.unread}</span>`:''}</button>`;
+const header=(t,s)=>`<div class="hd"><div class="l">${logo(40)}<div><h2>${t}</h2><small>${s}</small></div></div>${bell()}</div>`;
+const headerBack=(t,s,noBell)=>`<div class="hd back"><div class="l"><button class="rnd" data-act="back">${ic('chevL',CL.ink,22)}</button><div><h2>${t}</h2><small>${s}</small></div></div>${noBell?'':bell()}</div>`;
+// ---------- screens ----------
+function wellCard(id){let v,st,tr,sp;
+ if(id==='F2'){v=S.v2;st=f2State();tr=f2Trend();sp=spark(hist2(),STL[st][1],250,950,SLOTS);}
+ else{v=id==='F1'?S.v1:S.v3;st='ok';tr='Stable';const h=id==='F1'?H1:H3;sp=spark(h.slice(0,18),CL.ok,v-60,v+60);}
+ const [lb,c,b]=STL[st];const label=id==='F2'&&S.phase==='stopped'?'Pompe arrêtée':lb;
+ return `<div class="well ${st==='ok'?'':st}" data-act="well" data-w="${id}"><div class="row"><span class="nm">Forage ${id}</span><span class="row" style="gap:6px">${pill(label,c,b)}${ic('chevR',CL.muted,18)}</span></div>
+ <div class="bot"><div><div><span class="val" style="font-size:28px;color:${st==='ok'?CL.ink:c}">${fmt(v)}</span><span class="unit">µS/cm</span></div><div class="tr" style="color:${st==='ok'?CL.muted:c}">${tr}</div></div>${sp}</div></div>`;}
+function rHome(){const st=f2State(),bad=st==='bad';const t=S.phase==='stopped'?'Pompe F2 arrêtée':bad?'1 forage en alerte':st==='warn'?'1 forage en vigilance':'Tous les forages normaux';
+ return `<div class="col">${header('SalinWatch','Eau Démo SARL · Togbin')}<div class="sum ${bad?'bad':''}"><div class="k">ÉTAT DU SITE</div><div class="t">${t}</div><div class="s">${S.phase==='idle'?'Mis à jour il y a 2 s':'Mis à jour à l’instant'}</div></div><div class="lab">Vos forages (3)</div>${wellCard('F1')}${wellCard('F2')}${wellCard('F3')}</div>`;}
+function rDetail(){const id=S.well;let v,st,vals,slots,tr,lbl;
+ if(id==='F2'){v=S.v2;st=f2State();vals=hist2();slots=SLOTS;tr=f2Trend();lbl=S.phase==='stopped'?'Pompe arrêtée':(S.phase==='rise2'&&v>=885?'Arrêt en cours':STL[st][0]);}
+ else{v=id==='F1'?S.v1:S.v3;st='ok';vals=id==='F1'?H1:H3;slots=vals.length;tr='→ Stable sur 7 jours';lbl='Normal';}
+ const [,c,b]=STL[st];
+ return `<div class="col">${headerBack('Forage '+id,'Togbin')}<div class="card">${pill(lbl,c,b)}<div style="margin-top:8px"><span class="val" style="font-size:42px;color:${c}">${fmt(v)}</span><span class="unit" style="font-size:15px">µS/cm</span></div><div class="tr" style="font-size:13px;color:${c}">${tr}</div><div class="gauge"><i style="width:${Math.min(100,v/900*100)}%;background:${c}"></i></div><div class="gl">Arrêt auto 900</div></div>
+ ${id==='F2'&&S.phase==='stopped'?`<div class="banner"><div class="ib">${ic('power','#fff',22)}</div><div><b>Pompe F2 arrêtée automatiquement</b><span>Eau encore douce · SMS envoyé au gérant</span></div></div>`:''}
+ <div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">7 derniers jours</div>${chart(vals,c,slots)}<div class="days"><span>mer</span><span>jeu</span><span>ven</span><span>sam</span><span>dim</span><span>lun</span><span>auj.</span></div></div>
+ ${id==='F2'&&S.phase==='stopped'?`<button class="btn" data-act="tab" data-t="plan">Voir le plan du jour</button>`:''}</div>`;}
+function rPlan(){const seg=(s,e,c)=>`<div class="seg"><i style="left:${s/24*100}%;width:${(e-s)/24*100}%;background:${c}"></i></div>`;
+ const it=(n,h,s,e,c,note)=>`<div><div class="row"><b style="font-size:14px;font-weight:600">${n}</b><b style="font-size:13px;font-weight:600;color:${c}">${h}</b></div>${seg(s,e,c)}${note?`<div style="font-size:12px;font-weight:500;color:${c};margin-top:7px">${note}</div>`:''}</div>`;
+ return `<div class="col">${header('Plan du jour',new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}).replace(/^./,m=>m.toUpperCase()))}<div class="card"><div><span style="font-size:30px;font-weight:700">228 m³</span><span class="unit">prévus</span></div><div class="row" style="justify-content:flex-start;gap:6px;margin-top:6px;color:${CL.ok};font-size:13px;font-weight:600">${ic('check',CL.ok,16)}Production maintenue</div></div>
+ <div class="card col"><div style="font-size:15px;font-weight:600">Horaires du jour</div>${it('Forage F1','18 h · 108 m³',4,22,CL.brand)}${it('Forage F2','4 h · 20 m³',1,5,CL.warn,'En repos')}${it('Forage F3','20 h · 100 m³',3,23,CL.brand)}<div class="ax"><span>0 h</span><span>6 h</span><span>12 h</span><span>18 h</span><span>24 h</span></div></div>
+ <button class="btn ${S.plan?'ok':''}" data-act="plan">${ic('check','#fff',18)}${S.plan?'Plan appliqué aux pompes':'Appliquer le plan'}</button></div>`;}
+function rMap(){const bad=f2State()==='bad';const pts=[[28,165,'ok'],[55,175,'ok'],[100,178,'ok'],[137,181,'warn'],[178,166,'warn'],[192,145,'ok'],[224,170,'warn'],[246,178,'ok'],[274,170,'ok'],[296,176,'ok'],[170,122,'ok'],[238,125,'ok'],[82,150,'ok']];const site=bad?CL.bad:CL.warn;
+ return `<div class="col">${header('Intrusion saline','Bande côtière · 14 stations')}<div class="card"><svg viewBox="0 0 318 250" width="100%" style="display:block;border-radius:12px"><rect width="318" height="250" rx="12" fill="#EEF2E4"/><path d="M0 192 C55 198 110 186 160 194 S265 188 318 192 V250 H0Z" fill="#CFE6EF"/><ellipse cx="205" cy="98" rx="42" ry="24" fill="#CFE6EF"/><path d="M0 172 C40 168 80 176 118 171" stroke="#CFE6EF" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M0 160 C80 156 170 166 318 160" stroke="${CL.bad}" stroke-width="1.5" stroke-dasharray="5 4" fill="none" opacity=".55"/>${pts.map(([x,y,s])=>`<circle cx="${x}" cy="${y}" r="6" fill="${s==='ok'?CL.ok:CL.warn}" stroke="#fff" stroke-width="2"/>`).join('')}<circle cx="157" cy="180" r="7" fill="${site}" class="${bad?'pulse':''}"/><circle cx="157" cy="180" r="7" fill="${site}" stroke="#fff" stroke-width="2.5"/>
+ <g font-family="Inter,system-ui,sans-serif" font-size="11" font-weight="600" fill="${CL.muted}"><text x="12" y="157">Ouidah</text><text x="165" y="69">Abomey-Calavi</text><text x="204" y="161">Cotonou</text><text x="250" y="197">Sèmè-Podji</text></g><text x="180" y="101" font-size="10" font-weight="500" fill="${CL.brand}">Lac Nokoué</text><text x="112" y="211" font-size="11" font-weight="700" fill="${site}">Votre site · Togbin</text><rect x="105" y="160" width="125" height="58" fill="transparent" data-act="well" data-w="F2" style="cursor:pointer"/></svg>
+ <div class="row" style="justify-content:flex-start;gap:8px;margin-top:12px;flex-wrap:wrap">${pill('● Normal 10',CL.ok,CL.okBg)}${pill('● Vigilance '+(bad?3:4),CL.warn,CL.warnBg)}${pill('● Alerte '+(bad?1:0),CL.bad,CL.badBg)}</div></div></div>`;}
+function rReport(){return `<div class="col">${header('Rapport mensuel','Septembre 2026 · 3 forages')}<div class="sum" style="background:${CL.ok}"><div class="k">CONFORMITÉ DU MOIS</div><div class="t" style="font-size:36px">100 %</div><div style="font-size:13px;font-weight:500">du temps sous le seuil d’alerte (750 µS/cm)</div></div>
+ <div class="card" style="padding:8px 16px"><table><tr><th>Forage</th><th>Moyenne</th><th>Max</th><th>Pompage</th></tr><tr><td>F1</td><td>318</td><td>341</td><td>420 h</td></tr><tr><td>F2</td><td>372</td><td>468</td><td>396 h</td></tr><tr><td>F3</td><td>289</td><td>306</td><td>430 h</td></tr></table><div style="font-size:11px;font-weight:500;color:${CL.muted};padding:4px 0 8px">Valeurs en µS/cm</div></div>
+ <button class="btn ${S.pdf?'ok':''}" data-act="pdf">${ic(S.pdf?'check':'download','#fff',18)}${S.pdf?'Rapport téléchargé':'Télécharger en PDF'}</button></div>`;}
+function rNotifs(){const item=(icn,t,s,c,b)=>`<div class="ni"><div class="ib" style="background:${b}">${ic(icn,c,20)}</div><div><b>${t}</b><span>${s}</span></div></div>`;
+ const ev=S.events.slice().reverse().map(e=>e.type==='stop'?item('power','Pompe F2 arrêtée automatiquement',e.at+' · 905 µS/cm',CL.bad,CL.badBg):item('alert','Salinité en hausse rapide · F2',e.at+' · 760 µS/cm',CL.warn,CL.warnBg)).join('');
+ return `<div class="col">${headerBack('Notifications','Aujourd’hui',true)}${ev}${item('check','Plan du jour appliqué','06:00 · 3 forages',CL.ok,CL.okBg)}${item('file','Rapport de septembre disponible','1er octobre',CL.brand,CL.brandBg)}<button class="btn ghost" data-act="replay">${ic('replay',CL.brand,18)}Rejouer la démo</button></div>`;}
+const R={home:rHome,detail:rDetail,plan:rPlan,map:rMap,report:rReport,notifs:rNotifs};
+const TABS=[['home','Accueil','home'],['plan','Plan','calendar'],['map','Carte','map'],['report','Rapport','file']];
+function renderTabs(){const tabbed=['home','plan','map','report'].includes(S.screen);$('#tabs').className=tabbed?'':'hide';$('#tabs').innerHTML=TABS.map(([k,l,i])=>`<button class="${S.screen===k?'on':''}" data-act="tab" data-t="${k}">${ic(i,S.screen===k?CL.brand:CL.muted,24)}${l}</button>`).join('');}
+function render(){const el=$('#s-'+S.screen);el.innerHTML=R[S.screen]();renderTabs();}
+let raf=0;function invalidate(){if(!raf)raf=requestAnimationFrame(()=>{raf=0;render();});}
+function go(scr,opt={}){if(opt.well)S.well=opt.well;const prev=S.screen;if(scr==='notifs')S.unread=0;S.screen=scr;
+ document.querySelectorAll('.scr').forEach(e=>{const on=e.id==='s-'+scr;e.classList.toggle('off',!on&&e.id!=='s-'+prev);e.classList.remove('offL');});
+ const p=$('#s-'+prev);if(prev!==scr){p.classList.add(opt.back?'off':'offL');}
+ const n=$('#s-'+scr);n.classList.remove('off','offL');n.scrollTop=0;render();}
+// ---------- push ----------
+let pushType=null,pushTimer=0;
+function showPush(type){pushType=type;const A={alert:['⚠ Forage F2 : salinité en hausse rapide','760 µS/cm, +46 % en 1 h. Arrêt automatique prévu à 900.'],stop:['Pompe F2 arrêtée automatiquement','905 µS/cm, avant que le sel ne se sente. SMS envoyé au gérant.']}[type];
+ $('#push').innerHTML=`<div class="h"><span>${logo(22)}SALINWATCH</span>maintenant</div><b>${A[0]}</b><p>${A[1]}</p>`;$('#push').classList.add('on');$('#veil').classList.add('on');
+ try{navigator.vibrate&&navigator.vibrate(type==='stop'?[300,120,300]:[200,100,200]);}catch(e){}
+ clearTimeout(pushTimer);if(type==='stop')pushTimer=setTimeout(hidePush,4500);}
+function hidePush(){$('#push').classList.remove('on');$('#veil').classList.remove('on');pushType=null;}
+// ---------- simulation ----------
+let anim=null;
+function animateTo(target,dur,onStep,onDone){const from=S.v2,t0=performance.now();cancelAnimationFrame(anim);
+ const step=t=>{const k=Math.min(1,(t-t0)/dur);const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;S.v2=from+(target-from)*(0.35*k+0.65*e);
+  S.v1=320+Math.sin(t/700)*2.4;S.v3=290+Math.cos(t/800)*1.8;onStep&&onStep();invalidate();
+  if(k<1)anim=requestAnimationFrame(step);else onDone&&onDone();};anim=requestAnimationFrame(step);}
+function startRise1(){S.phase='rise1';animateTo(760,4200,()=>{if(S.v2>=750&&S.phase==='rise1'){S.phase='alert';S.alertAt=now();S.events.push({type:'alert',at:S.alertAt});S.unread++;showPush('alert');}});}
+function startRise2(){if(S.phase!=='alert')return;S.phase='rise2';hidePush();if(S.screen!=='detail'||S.well!=='F2')go('detail',{well:'F2'});
+ setTimeout(()=>animateTo(905,2600,null,()=>{S.phase='stopped';S.stopAt=now();S.events.push({type:'stop',at:S.stopAt});S.unread++;invalidate();showPush('stop');}),250);}
+// idle jitter for F1/F3
+setInterval(()=>{if(S.phase==='idle'||S.phase==='alert'||S.phase==='stopped'){S.v1=320+(Math.random()-.5)*4;S.v3=290+(Math.random()-.5)*4;
+ document.querySelectorAll('[data-w="F1"] .val').forEach(n=>n.textContent=fmt(S.v1));document.querySelectorAll('[data-w="F3"] .val').forEach(n=>n.textContent=fmt(S.v3));}},1500);
+// ---------- events (pointer-based so a redraw during an animation never swallows a tap) ----------
+let down=null;
+document.addEventListener('pointerdown',e=>{down={t:e.target,x:e.clientX,y:e.clientY};},{passive:true});
+document.addEventListener('pointerup',e=>{if(!down)return;const d=down;down=null;if(Math.abs(e.clientX-d.x)>12||Math.abs(e.clientY-d.y)>12)return;handle({target:d.t});});
+function handle(e){const a=e.target.closest&&e.target.closest('[data-act]');
+ if(e.target.closest('#push')){if(pushType==='alert')startRise2();else hidePush();return;}
+ if(e.target.id==='veil'){if(pushType==='alert')startRise2();else hidePush();return;}
+ if(e.target.closest('#splash')){endSplash();return;}
+ if(!a)return;const act=a.dataset.act;
+ if(act==='tab')go(a.dataset.t);
+ else if(act==='well'){if(a.dataset.w==='F2'&&S.phase==='alert')startRise2();else go('detail',{well:a.dataset.w});}
+ else if(act==='back')go('home',{back:true});
+ else if(act==='notifs')go('notifs');
+ else if(act==='plan'){S.plan=true;render();}
+ else if(act==='pdf'){S.pdf=true;render();}
+ else if(act==='replay'){cancelAnimationFrame(anim);hidePush();reset();go('home',{back:true});$('#splash').style.display='';$('#splash').classList.remove('gone');splash();}
+}
+let spT=0,started=false;
+function endSplash(){clearTimeout(spT);const sp=$('#splash');sp.classList.add('gone');setTimeout(()=>{if(sp.classList.contains('gone'))sp.style.display='none';},500);if(!started){started=true;setTimeout(startRise1,900);}}
+function splash(){started=false;S.screen='home';render();spT=setTimeout(endSplash,1400);}
+splash();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
