@@ -188,7 +188,7 @@ function rDetail(){const id=S.well;let v,st,vals,slots,tr,lbl;
  else{v=id==='F1'?S.v1:S.v3;st='ok';vals=id==='F1'?H1:H3;slots=vals.length;tr='→ Stable sur 7 jours';lbl='Normal';}
  const [,c,b]=STL[st];
  return `<div class="col">${headerBack('Forage '+id,'Togbin')}<div class="card">${pill(lbl,c,b)}<div style="margin-top:8px"><span class="val" style="font-size:42px;color:${c}">${fmt(v)}</span><span class="unit" style="font-size:15px">µS/cm</span></div><div class="tr" style="font-size:13px;color:${c}">${tr}</div><div class="gauge"><i style="width:${Math.min(100,v/900*100)}%;background:${c}"></i></div><div class="gl">Arrêt auto 900</div></div>
- ${id==='F2'&&S.phase==='stopped'?`<div class="banner"><div class="ib">${ic('power','#fff',22)}</div><div><b>Pompe F2 arrêtée automatiquement</b><span>Eau encore douce · SMS envoyé au gérant</span></div></div>`:''}
+ ${id==='F2'&&S.phase==='stopped'?`<div class="banner"><div class="ib">${ic('power','#fff',22)}</div><div><b>Pompe F2 arrêtée automatiquement</b><span>SMS envoyé au gérant</span></div></div>`:''}
  <div class="card"><div style="font-size:14px;font-weight:600;margin-bottom:10px">7 derniers jours</div>${chart(vals,c,slots)}<div class="days"><span>mer</span><span>jeu</span><span>ven</span><span>sam</span><span>dim</span><span>lun</span><span>auj.</span></div></div>
  ${id==='F2'&&S.phase==='stopped'?`<button class="btn" data-act="tab" data-t="plan">Voir le plan du jour</button>`:''}</div>`;}
 function rPlan(){const stopped=S.phase==='stopped';
@@ -200,11 +200,9 @@ function rPlan(){const stopped=S.phase==='stopped';
  const rows=W.map(w=>`<div class="tlr"><div><b>${w.id}</b><span class="dl" style="color:${w.c}">${w.d}</span></div><div class="trk"><i style="left:${w.s/24*100}%;width:${(w.e-w.s)/24*100}%;background:${w.c}">${hh(w.s)}–${hh(w.e)} h</i></div></div>`).join('');
  const cards=W.map(w=>`<div class="wc"><div class="row"><b>${w.id}</b>${pill(w.t,w.tc,w.tb)}</div><div class="n">${w.e-w.s} h</div><span>${w.m3} m³</span></div>`).join('');
  return `<div class="col">${header('Plan du jour',d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}).replace(/^./,m=>m.toUpperCase()))}
- <div class="hero">${donut}<div><div class="k">PRODUCTION PRÉVUE</div><div class="big">228 m³</div><div class="s">Besoin du jour : 224 m³</div><div class="okp">${ic('check','#7BE0B0',14)} Production maintenue</div></div></div>
- <div class="why"><div class="ib">${ic('alert',CL.warn,18)}</div><div><b>Pourquoi ce plan ?</b><p>${why}</p></div></div>
- <div class="card"><div class="row"><b style="font-size:15px">Horaires de pompage</b><span class="leg"><i style="background:${CL.brand}"></i>Pompage<i style="background:${CL.line}"></i>Arrêt</span></div>
+ <div class="hero">${donut}<div><div class="k">PRODUCTION PRÉVUE</div><div class="big">228 m³</div><div class="okp">${ic('check','#7BE0B0',14)} Production maintenue</div></div></div>
+ <div class="card"><div class="row"><b style="font-size:15px">Horaires du jour</b></div>
  <div class="tl"><div class="nowl" style="left:calc(68px + (100% - 68px) * ${(h/24).toFixed(4)})"><span>${hh(d.getHours())}:${hh(d.getMinutes())}</span></div>${rows}<div class="tlr ax2"><div></div><div class="ax"><span>0 h</span><span>6 h</span><span>12 h</span><span>18 h</span><span>24 h</span></div></div></div></div>
- <div class="wcs">${cards}</div>
  <button class="btn ${S.plan?'ok':''}" data-act="plan">${ic('check','#fff',18)}${S.plan?'Plan appliqué aux pompes':'Appliquer le plan'}</button></div>`;}
 const MB={w:2.04,e:2.66,s:6.30,n:6.53,W:903,H:337};
 const merc=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360));
@@ -218,10 +216,9 @@ function rMap(){const bad=f2State()==='bad';const site=bad?CL.bad:CL.warn;const 
  <span class="st site ${bad?'alert':''}" style="left:${sx}px;top:${sy}px;background:${site}" data-act="well" data-w="F2"></span>
  <span class="sitelab" style="left:${sx}px;top:${sy+12}px;color:${site}" data-act="well" data-w="F2">Votre site · Togbin</span>
  <span class="attr">© OpenStreetMap</span></div></div>
- <div class="maphint">← Glissez pour parcourir la côte →</div>
  <div class="row" style="justify-content:flex-start;gap:8px;margin-top:10px;flex-wrap:wrap">${pill('● Normal 10',CL.ok,CL.okBg)}${pill('● Vigilance '+(bad?3:4),CL.warn,CL.warnBg)}${pill('● Alerte '+(bad?1:0),CL.bad,CL.badBg)}</div></div>
- <div class="why"><div class="ib" style="background:${CL.brandBg}">${ic('map',CL.brand,18)}</div><div><b>Cette semaine</b><p>${bad?'Alerte à Togbin.':'Vigilance à Togbin.'} Salinité en hausse aussi à Cococodji, Godomey et Fidjrossè, le long de la côte.</p></div></div></div>`;}
-function rReport(){return `<div class="col">${header('Rapport mensuel','Septembre 2026 · 3 forages')}<div class="sum" style="background:${CL.ok}"><div class="k">CONFORMITÉ DU MOIS</div><div class="t" style="font-size:36px">100 %</div><div style="font-size:13px;font-weight:500">du temps sous le seuil d’alerte (750 µS/cm)</div></div>
+ </div>`;}
+function rReport(){return `<div class="col">${header('Rapport mensuel','Septembre 2026 · 3 forages')}<div class="sum" style="background:${CL.ok}"><div class="k">CONFORMITÉ DU MOIS</div><div class="t" style="font-size:36px">100 %</div><div style="font-size:13px;font-weight:500">sous le seuil d’alerte</div></div>
  <div class="card" style="padding:8px 16px"><table><tr><th>Forage</th><th>Moyenne</th><th>Max</th><th>Pompage</th></tr><tr><td>F1</td><td>318</td><td>341</td><td>420 h</td></tr><tr><td>F2</td><td>372</td><td>468</td><td>396 h</td></tr><tr><td>F3</td><td>289</td><td>306</td><td>430 h</td></tr></table><div style="font-size:11px;font-weight:500;color:${CL.muted};padding:4px 0 8px">Valeurs en µS/cm</div></div>
  <button class="btn ${S.pdf?'ok':''}" data-act="pdf">${ic(S.pdf?'check':'download','#fff',18)}${S.pdf?'Rapport téléchargé':'Télécharger en PDF'}</button></div>`;}
 function rNotifs(){const item=(icn,t,s,c,b)=>`<div class="ni"><div class="ib" style="background:${b}">${ic(icn,c,20)}</div><div><b>${t}</b><span>${s}</span></div></div>`;
