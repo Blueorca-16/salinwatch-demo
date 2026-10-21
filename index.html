@@ -230,14 +230,25 @@ function mapHome(v){const [sx,sy]=proj(...SITE);const s=Math.max(mapMin(v),0.42)
 function applyMV(anim){const v=mapEl();if(!v)return;const inn=v.querySelector('.mapin');if(!MV)mapHome(v);clampMV(v);inn.style.transition=anim?'transform .3s ease':'none';inn.style.transform=`translate(${MV.x}px,${MV.y}px) scale(${MV.s})`;inn.style.setProperty('--k',(1/MV.s).toFixed(4));}
 function zoomAt(v,f,cx,cy,anim){const px=(cx-MV.x)/MV.s,py=(cy-MV.y)/MV.s;MV.s=Math.min(1.5,Math.max(mapMin(v),MV.s*f));MV.x=cx-px*MV.s;MV.y=cy-py*MV.s;applyMV(anim);}
 function initMap(){const v=mapEl();if(!v||v._init)return;v._init=1;const P=new Map();let pinch=null,lastTap=0;
- v.addEventListener('pointerdown',e=>{if(e.target.closest('.mapctl'))return;try{v.setPointerCapture(e.pointerId);}catch(_){}P.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});pinch=null;});
- v.addEventListener('pointermove',e=>{const pr=P.get(e.pointerId);if(!pr)return;const r=v.getBoundingClientRect();const dx=e.clientX-pr.x,dy=e.clientY-pr.y;pr.x=e.clientX;pr.y=e.clientY;
-  if(P.size===1){MV.x+=dx;MV.y+=dy;applyMV();}
-  else if(P.size===2){const [a,b]=[...P.values()];const d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2-r.left,my=(a.y+b.y)/2-r.top;if(pinch){MV.x+=mx-pinch.mx;MV.y+=my-pinch.my;zoomAt(v,d/pinch.d,mx,my);}pinch={d,mx,my};}});
- const up=e=>{const pr=P.get(e.pointerId);P.delete(e.pointerId);pinch=null;
-  if(pr&&P.size===0&&Math.hypot(e.clientX-pr.x0,e.clientY-pr.y0)<10&&!e.target.closest('[data-act]')){const t=performance.now();if(t-lastTap<320){const r=v.getBoundingClientRect();zoomAt(v,1.8,e.clientX-r.left,e.clientY-r.top,true);lastTap=0;}else lastTap=t;}};
- v.addEventListener('pointerup',up);v.addEventListener('pointercancel',e=>{P.delete(e.pointerId);pinch=null;});
- v.addEventListener('wheel',e=>{e.preventDefault();const r=v.getBoundingClientRect();zoomAt(v,e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top);},{passive:false});}
+ const rel=(x,y)=>{const r=v.getBoundingClientRect();return [x-r.left,y-r.top];};
+ const dbl=(x,y)=>{const t=performance.now();if(t-lastTap<320){const [cx,cy]=rel(x,y);zoomAt(v,1.8,cx,cy,true);lastTap=0;}else lastTap=t;};
+ // Souris (ordinateur)
+ v.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.target.closest('.mapctl'))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});});
+ v.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const pr=P.get(e.pointerId);if(!pr)return;MV.x+=e.clientX-pr.x;MV.y+=e.clientY-pr.y;pr.x=e.clientX;pr.y=e.clientY;applyMV();});
+ const mup=e=>{if(e.pointerType!=='mouse')return;const pr=P.get(e.pointerId);P.delete(e.pointerId);if(pr&&Math.hypot(e.clientX-pr.x0,e.clientY-pr.y0)<8&&!e.target.closest('[data-act]'))dbl(e.clientX,e.clientY);};
+ v.addEventListener('pointerup',mup);v.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')P.delete(e.pointerId);});
+ v.addEventListener('wheel',e=>{e.preventDefault();const [cx,cy]=rel(e.clientX,e.clientY);zoomAt(v,e.deltaY<0?1.15:1/1.15,cx,cy);},{passive:false});
+ // Tactile (téléphone) : un doigt = déplacer, deux doigts = zoomer, double-tap = zoomer
+ let T=null,moved=false,start=null;
+ const snap=e=>{const t=[...e.touches].map(x=>({x:x.clientX,y:x.clientY}));if(t.length>=2){const [a,b]=t;const [mx,my]=rel((a.x+b.x)/2,(a.y+b.y)/2);return {n:2,d:Math.hypot(a.x-b.x,a.y-b.y),mx,my};}if(t.length===1)return {n:1,x:t[0].x,y:t[0].y};return null;};
+ v.addEventListener('touchstart',e=>{if(e.target.closest('.mapctl'))return;T=snap(e);if(e.touches.length===1){moved=false;start={x:e.touches[0].clientX,y:e.touches[0].clientY};}else moved=true;if(e.touches.length>1)e.preventDefault();},{passive:false});
+ v.addEventListener('touchmove',e=>{if(!T)return;e.preventDefault();const n=snap(e);if(!n)return;
+  if(n.n===2&&T.n===2){MV.x+=n.mx-T.mx;MV.y+=n.my-T.my;zoomAt(v,n.d/T.d,n.mx,n.my);}
+  else if(n.n===1&&T.n===1){MV.x+=n.x-T.x;MV.y+=n.y-T.y;applyMV();if(start&&Math.hypot(n.x-start.x,n.y-start.y)>8)moved=true;}
+  T=n;},{passive:false});
+ v.addEventListener('touchend',e=>{T=snap(e);if(e.touches.length===0&&!moved&&start&&!e.target.closest('[data-act]'))dbl(start.x,start.y);});
+ v.addEventListener('touchcancel',()=>{T=null;});
+ ['gesturestart','gesturechange'].forEach(t=>v.addEventListener(t,e=>e.preventDefault(),{passive:false}));}
 function rReport(){return `<div class="col">${header('Rapport mensuel','Septembre 2026 · 3 forages')}<div class="sum" style="background:${CL.ok}"><div class="k">CONFORMITÉ DU MOIS</div><div class="t" style="font-size:36px">100 %</div><div style="font-size:13px;font-weight:500">sous le seuil d’alerte</div></div>
  <div class="card" style="padding:8px 16px"><table><tr><th>Forage</th><th>Moyenne</th><th>Max</th><th>Pompage</th></tr><tr><td>F1</td><td>318</td><td>341</td><td>420 h</td></tr><tr><td>F2</td><td>372</td><td>468</td><td>396 h</td></tr><tr><td>F3</td><td>289</td><td>306</td><td>430 h</td></tr></table><div style="font-size:11px;font-weight:500;color:${CL.muted};padding:4px 0 8px">Valeurs en µS/cm</div></div>
  <button class="btn ${S.pdf?'ok':''}" data-act="pdf">${ic(S.pdf?'check':'download','#fff',18)}${S.pdf?'Rapport téléchargé':'Télécharger en PDF'}</button></div>`;}
